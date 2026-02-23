@@ -4,7 +4,7 @@ import base64
 import json
 
 SOURCE_FILE = "sources/subs.txt"
-OUTPUT_FILE = "configs.txt"  # همه کانفیگ‌ها در این فایل ذخیره می‌شن
+OUTPUT_FILE = "output/configs.txt"  # همه کانفیگ‌ها در این فایل ذخیره می‌شن
 
 # تابع خواندن ساب لینک‌ها از فایل
 def read_sources():
