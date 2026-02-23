@@ -2,10 +2,9 @@ import os
 import requests
 import base64
 import json
-from datetime import datetime
 
 SOURCE_FILE = "sources/subs.txt"
-OUTPUT_DIR = "output"
+OUTPUT_FILE = "configs.txt"  # همه کانفیگ‌ها در این فایل ذخیره می‌شن
 
 # تابع خواندن ساب لینک‌ها از فایل
 def read_sources():
@@ -40,21 +39,16 @@ def convert_to_wills(content):
 def convert_to_trojan(content):
     return f"trojan_config = {content}"
 
-# تابع ذخیره کردن فایل با نام شمارنده
-def save_output(content, counter):
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-
-    filename = f"Mine{counter:02d}.conf"  # تغییر نام به Mine01, Mine02, ...
-    file_path = os.path.join(OUTPUT_DIR, filename)
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content)
+# تابع ذخیره کردن تمام کانفیگ‌ها در یک فایل تکست
+def save_all_configs(content):
+    with open(OUTPUT_FILE, "a", encoding="utf-8") as f:
+        f.write(content + "\n")
 
 # عملیات اصلی
 def main():
     sources = read_sources()
 
-    # پردازش کانفیگ‌ها
+    # پردازش کانفیگ‌ها و ذخیره همه کانفیگ‌ها در یک فایل
     for i, url in enumerate(sources, start=1):
         print(f"Fetching {url}")
         data = fetch_sub(url)
@@ -64,13 +58,14 @@ def main():
             # فرض می‌کنیم که داده‌ها به فرمت JSON هستند
             try:
                 json_data = json.loads(data)
+
                 # تبدیل به فرمت‌های مختلف (ویلس و تروجان)
                 wills_config = convert_to_wills(json.dumps(json_data, indent=4))
                 trojan_config = convert_to_trojan(json.dumps(json_data, indent=4))
 
-                # ذخیره خروجی
-                save_output(wills_config, i)
-                save_output(trojan_config, i)
+                # ذخیره کانفیگ‌ها در فایل تکست
+                save_all_configs(f"Mine{i:02d} - {wills_config}")
+                save_all_configs(f"Mine{i:02d} - {trojan_config}")
 
             except json.JSONDecodeError:
                 print(f"Invalid JSON for {url}")
